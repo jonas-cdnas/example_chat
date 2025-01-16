@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio de Logging y Monitoreo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
+</head>
+
+    <body>
+
+        <!-- Título y Escudo -->
+        <div class="header">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Escudo" class="escudo">
+            <h1>Ejercicio de Logging y Monitoreo</h1>
+        </div>
+
+        <h1>M.C.C. Chat</h1>
+        <ul id="messages"></ul>
+        <input id="message" placeholder="Type a message..." autocomplete="off">
+        <button onclick="sendMessage()">Enviar</button>
+    
+        <script>
+            const socket = io();
+    
+            // Manejar mensajes entrantes
+            socket.on('message', (msg) => {
+                const messages = document.getElementById('messages');
+                const item = document.createElement('li');
+    
+                // Verificar el tipo de mensaje
+                if (msg.type === 'chat') {
+                    item.textContent = `${msg.sender}: ${msg.data}`;
+                } else if (msg.type === 'status') {
+                    item.textContent = `* ${msg.data}`;
+                } else {
+                    item.textContent = 'Unknown message format';
+                }
+    
+                messages.appendChild(item);
+            });
+    
+            // Función para enviar mensajes
+            function sendMessage() {
+                const input = document.getElementById('message');
+                const message = input.value.trim();
+                if (message) {
+                    socket.emit('message', message); // Enviar mensaje al servidor
+                    input.value = ''; // Limpiar el campo de entrada
+                }
+            }
+        </script>
+    </body>
+</html>
